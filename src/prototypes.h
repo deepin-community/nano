@@ -1,7 +1,7 @@
 /**************************************************************************
  *   prototypes.h  --  This file is part of GNU nano.                     *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2021 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2024 Free Software Foundation, Inc.    *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
  *   it under the terms of the GNU General Public License as published    *
@@ -53,7 +53,6 @@ extern message_type lastmessage;
 extern linestruct *pletion_line;
 
 extern bool also_the_last;
-extern bool hide_cursor;
 
 extern char *answer;
 
@@ -76,11 +75,13 @@ extern int shiftcontrolup, shiftcontroldown;
 extern int shiftcontrolhome, shiftcontrolend;
 extern int altleft, altright;
 extern int altup, altdown;
+extern int althome, altend;
 extern int altpageup, altpagedown;
 extern int altinsert, altdelete;
 extern int shiftaltleft, shiftaltright;
 extern int shiftaltup, shiftaltdown;
 #endif
+extern int mousefocusin, mousefocusout;
 
 #ifdef ENABLED_WRAPORJUSTIFY
 extern ssize_t fill;
@@ -88,15 +89,16 @@ extern size_t wrap_at;
 #endif
 
 extern WINDOW *topwin;
-extern WINDOW *edit;
-extern WINDOW *bottomwin;
+extern WINDOW *midwin;
+extern WINDOW *footwin;
 extern int editwinrows;
 extern int editwincols;
 extern int margin;
-extern int thebar;
+extern int sidebar;
 #ifndef NANO_TINY
 extern int *bardata;
 extern ssize_t stripe_column;
+extern int cycling_aim;
 #endif
 
 extern linestruct *cutbuffer;
@@ -142,6 +144,9 @@ extern char *alt_speller;
 extern syntaxtype *syntaxes;
 extern char *syntaxstr;
 extern bool have_palette;
+extern bool rescind_colors;
+extern bool perturbed;
+extern bool recook;
 #endif
 
 extern bool refresh_needed;
@@ -179,6 +184,9 @@ extern char *startup_problem;
 #endif
 #ifdef ENABLE_NANORC
 extern char *custom_nanorc;
+
+extern char *commandname;
+extern keystruct *planted_shortcut;
 #endif
 
 extern bool spotlighted;
@@ -232,6 +240,9 @@ char *mbrevstrpbrk(const char *head, const char *accept, const char *pointer);
 bool has_blank_char(const char *string);
 #endif
 bool white_string(const char *string);
+#if defined(ENABLE_SPELLER) || defined(ENABLE_COLOR)
+void strip_leading_blanks_from(char *string);
+#endif
 
 /* Most functions in color.c. */
 #ifdef ENABLE_COLOR
@@ -243,6 +254,7 @@ void precalc_multicolorinfo(void);
 #endif
 
 /* Most functions in cut.c. */
+void expunge(undo_type action);
 void do_delete(void);
 void do_backspace(void);
 #ifndef NANO_TINY
@@ -261,8 +273,8 @@ void cut_text(void);
 void cut_till_eof(void);
 void zap_text(void);
 void copy_marked_region(void);
-void copy_text(void);
 #endif
+void copy_text(void);
 void paste_text(void);
 
 /* Most functions in files.c. */
@@ -282,7 +294,7 @@ void close_buffer(void);
 void read_file(FILE *f, int fd, const char *filename, bool undoable);
 int open_file(const char *filename, bool new_one, FILE **f);
 char *get_next_filename(const char *name, const char *suffix);
-void do_insertfile_void(void);
+void do_insertfile(void);
 #ifndef NANO_TINY
 void do_execute(void);
 #endif
@@ -302,8 +314,8 @@ bool write_file(const char *name, FILE *thefile, bool normal,
 bool write_region_to_file(const char *name, FILE *stream, bool normal,
 				kind_of_writing_type method);
 #endif
-int do_writeout(bool exiting, bool withprompt);
-void do_writeout_void(void);
+int write_it_out(bool exiting, bool withprompt);
+void do_writeout(void);
 void do_savefile(void);
 char *real_dir_from_tilde(const char *path);
 #if defined(ENABLE_TABCOMP) || defined(ENABLE_BROWSER)
@@ -314,16 +326,16 @@ char *input_tab(char *buf, size_t *place, void (*refresh_func)(void), bool *list
 #endif
 
 /* Some functions in global.c. */
-const keystruct *first_sc_for(int menu, void (*func)(void));
+const keystruct *first_sc_for(int menu, void (*function)(void));
 size_t shown_entries_for(int menu);
-const keystruct *get_shortcut(int *keycode);
-functionptrtype func_from_key(int *keycode);
+const keystruct *get_shortcut(const int keycode);
+functionptrtype func_from_key(const int keycode);
 #if defined(ENABLE_BROWSER) || defined(ENABLE_HELP)
-functionptrtype interpret(int *keycode);
+functionptrtype interpret(const int keycode);
 #endif
 int keycode_from_string(const char *keystring);
 void shortcut_init(void);
-const char *flagtostr(int flag);
+const char *epithet_of_flag(int flag);
 
 /* Some functions in help.c. */
 #ifdef ENABLE_HELP
@@ -334,12 +346,8 @@ void do_help(void);
 /* Most functions in history.c. */
 #ifdef ENABLE_HISTORIES
 void history_init(void);
-void history_reset(const linestruct *list);
-void update_history(linestruct **item, const char *text);
-char *get_history_older(linestruct **h);
-char *get_history_newer(linestruct **h);
-void get_history_older_void(void);
-void get_history_newer_void(void);
+void reset_history_pointer_for(const linestruct *list);
+void update_history(linestruct **item, const char *text, bool avoid_duplicates);
 #ifdef ENABLE_TABCOMP
 char *get_history_completion(linestruct **h, char *s, size_t len);
 #endif
@@ -356,6 +364,12 @@ void to_first_line(void);
 void to_last_line(void);
 void do_page_up(void);
 void do_page_down(void);
+#ifndef NANO_TINY
+void to_top_row(void);
+void to_bottom_row(void);
+void do_cycle(void);
+void do_center(void);
+#endif
 #ifdef ENABLE_JUSTIFY
 void do_para_begin(linestruct **line);
 void do_para_end(linestruct **line);
@@ -364,8 +378,8 @@ void to_para_end(void);
 #endif
 void to_prev_block(void);
 void to_next_block(void);
-void do_prev_word(bool allow_punct);
-bool do_next_word(bool after_ends, bool allow_punct);
+void do_prev_word(void);
+bool do_next_word(bool after_ends);
 void to_prev_word(void);
 void to_next_word(void);
 void do_home(void);
@@ -375,7 +389,6 @@ void do_down(void);
 #if !defined(NANO_TINY) || defined(ENABLE_HELP)
 void do_scroll_up(void);
 void do_scroll_down(void);
-void do_center(void);
 #endif
 void do_left(void);
 void do_right(void);
@@ -390,6 +403,9 @@ void free_lines(linestruct *src);
 void renumber_from(linestruct *line);
 void print_view_warning(void);
 bool in_restricted_mode(void);
+#ifndef NANO_TINY
+void suggest_ctrlT_ctrlZ(void);
+#endif
 void finish(void);
 void close_and_go(void);
 void do_exit(void);
@@ -404,15 +420,15 @@ void handle_hupterm(int signal);
 #ifndef DEBUG
 void handle_crash(int signal);
 #endif
-void do_suspend(int signal);
-void do_continue(int signal);
+void suspend_nano(int signal);
+void do_suspend(void);
+void continue_nano(int signal);
 #if !defined(NANO_TINY) || defined(ENABLE_SPELLER) || defined(ENABLE_COLOR)
 void block_sigwinch(bool blockit);
 #endif
 #ifndef NANO_TINY
 void handle_sigwinch(int signal);
 void regenerate_screen(void);
-void do_toggle(int flag);
 #endif
 void disable_kb_interrupt(void);
 void enable_kb_interrupt(void);
@@ -423,7 +439,7 @@ void terminal_init(void);
 void confirm_margin(void);
 #endif
 void unbound_key(int code);
-bool okay_for_view(const keystruct *shortcut);
+bool changes_something(functionptrtype f);
 void inject(char *burst, size_t count);
 
 /* Most functions in prompt.c. */
@@ -432,7 +448,7 @@ void put_cursor_at_end_of_answer(void);
 void add_or_remove_pipe_symbol_from_answer(void);
 int do_prompt(int menu, const char *provided, linestruct **history_list,
 		void (*refresh_func)(void), const char *msg, ...);
-int do_yesno_prompt(bool all, const char *msg);
+int ask_user(bool withall, const char *question);
 
 /* Most functions in rcfile.c. */
 #if defined(ENABLE_NANORC) || defined(ENABLE_HISTORIES)
@@ -440,6 +456,7 @@ void display_rcfile_errors(void);
 void jot_error(const char *msg, ...);
 #endif
 #ifdef ENABLE_NANORC
+keystruct *strtosc(const char *input);
 #ifdef ENABLE_COLOR
 void parse_one_include(char *file, syntaxtype *syntax);
 void grab_and_store(const char *kind, char *ptr, regexlisttype **storage);
@@ -464,10 +481,12 @@ ssize_t do_replace_loop(const char *needle, bool whole_word_only,
 		const linestruct *real_current, size_t *real_current_x);
 void do_replace(void);
 void ask_for_and_do_replacements(void);
+#if !defined(NANO_TINY) || defined(ENABLE_SPELLER) || defined (ENABLE_LINTER) || defined (ENABLE_FORMATTER)
 void goto_line_posx(ssize_t line, size_t pos_x);
-void do_gotolinecolumn(ssize_t line, ssize_t column, bool retain_answer,
+#endif
+void goto_line_and_column(ssize_t line, ssize_t column, bool retain_answer,
 		bool interactive);
-void do_gotolinecolumn_void(void);
+void do_gotolinecolumn(void);
 #ifndef NANO_TINY
 void do_find_bracket(void);
 void put_or_lift_anchor(void);
@@ -497,7 +516,7 @@ void update_multiline_undo(ssize_t lineno, char *indentation);
 void update_undo(undo_type action);
 #endif /* !NANO_TINY */
 #ifdef ENABLE_WRAPPING
-bool do_wrap(void);
+void do_wrap(void);
 #endif
 #if defined(ENABLE_HELP) || defined(ENABLED_WRAPORJUSTIFY)
 ssize_t break_line(const char *textstart, ssize_t goal, bool snap_at_nl);
@@ -515,15 +534,19 @@ void do_full_justify(void);
 #ifdef ENABLE_SPELLER
 void do_spell(void);
 #endif
-#ifdef ENABLE_COLOR
+#ifdef ENABLE_LINTER
 void do_linter(void);
+#endif
+#ifdef ENABLE_FORMATTER
 void do_formatter(void);
 #endif
 #ifndef NANO_TINY
-void do_wordlinechar_count(void);
+void count_lines_words_and_characters(void);
 #endif
 void do_verbatim_input(void);
+#ifdef ENABLE_WORDCOMPLETION
 void complete_a_word(void);
+#endif
 
 /* All functions in utils.c. */
 void get_homedir(void);
@@ -533,7 +556,7 @@ int digits(ssize_t n);
 bool parse_num(const char *str, ssize_t *result);
 bool parse_line_column(const char *str, ssize_t *line, ssize_t *column);
 void recode_NUL_to_LF(char *string, size_t length);
-void recode_LF_to_NUL(char *string);
+size_t recode_LF_to_NUL(char *string);
 #if !defined(ENABLE_TINY) || defined(ENABLE_TABCOMP) || defined(ENABLE_BROWSER)
 void free_chararray(char **array, size_t len);
 #endif
@@ -563,18 +586,21 @@ void get_region(linestruct **top, size_t *top_x, linestruct **bot, size_t *bot_x
 void get_range(linestruct **top, linestruct **bot);
 #endif
 size_t number_of_characters_in(const linestruct *begin, const linestruct *end);
-#ifndef NANO_TINY
+#if !defined(NANO_TINY) || defined(ENABLE_SPELLER) || defined (ENABLE_LINTER) || defined (ENABLE_FORMATTER)
 linestruct *line_from_number(ssize_t number);
 #endif
 
 /* Most functions in winio.c. */
+#ifndef NANO_TINY
 void record_macro(void);
 void run_macro(void);
-size_t get_key_buffer_len(void);
+#endif
+size_t waiting_keycodes(void);
+void put_back(int keycode);
 #ifdef ENABLE_NANORC
 void implant(const char *string);
 #endif
-int parse_kbinput(WINDOW *win);
+int get_input(WINDOW *win);
 int get_kbinput(WINDOW *win, bool showcursor);
 char *get_verbatim_kbinput(WINDOW *win, size_t *count);
 #ifdef ENABLE_MOUSE
@@ -584,7 +610,7 @@ void blank_edit(void);
 void blank_statusbar(void);
 void wipe_statusbar(void);
 void blank_bottombars(void);
-void check_statusblank(void);
+void blank_it_when_expired(void);
 void set_blankdelay_to_one(void);
 char *display_string(const char *buf, size_t column, size_t span,
 						bool isdata, bool isprompt);
@@ -606,8 +632,8 @@ int go_forward_chunks(int nrows, linestruct **line, size_t *leftedge);
 bool less_than_a_screenful(size_t was_lineno, size_t was_leftedge);
 void edit_scroll(bool direction);
 #ifndef NANO_TINY
-size_t get_softwrap_breakpoint(const char *text, size_t leftedge,
-								bool *end_of_line);
+size_t get_softwrap_breakpoint(const char *linedata, size_t leftedge,
+								bool *kickoff, bool *end_of_line);
 size_t get_chunk_and_edge(size_t column, linestruct *line, size_t *leftedge);
 size_t chunk_for(size_t column, linestruct *line);
 size_t leftedge_for(size_t column, linestruct *line);
@@ -625,7 +651,6 @@ void spotlight(size_t from_col, size_t to_col);
 #ifndef NANO_TINY
 void spotlight_softwrapped(size_t from_col, size_t to_col);
 #endif
-void do_suspend_void(void);
 #ifdef ENABLE_EXTRA
 void do_credits(void);
 #endif
@@ -634,6 +659,10 @@ void do_credits(void);
 void case_sens_void(void);
 void regexp_void(void);
 void backwards_void(void);
+#ifdef ENABLE_HISTORIES
+void get_older_item(void);
+void get_newer_item(void);
+#endif
 void flip_replace(void);
 void flip_goto(void);
 #ifdef ENABLE_BROWSER
@@ -642,12 +671,12 @@ void goto_dir(void);
 #endif
 #ifndef NANO_TINY
 void do_nothing(void);
-void do_toggle_void(void);
-void dos_format_void(void);
-void mac_format_void(void);
-void append_void(void);
-void prepend_void(void);
-void backup_file_void(void);
+void do_toggle(void);
+void dos_format(void);
+void mac_format(void);
+void append_it(void);
+void prepend_it(void);
+void back_it_up(void);
 void flip_execute(void);
 void flip_pipe(void);
 void flip_convert(void);

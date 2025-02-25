@@ -1,0 +1,2 @@
+nano-tiny: bin-sbin-mismatch bin/nano-tiny -> usr/bin/nano-tiny [postinst]
+nano-tiny: bin-sbin-mismatch bin/nano-tiny -> usr/bin/nano-tiny [prerm]
