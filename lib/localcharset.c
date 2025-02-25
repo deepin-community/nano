@@ -1,6 +1,6 @@
 /* Determine a canonical name for the current locale's character encoding.
 
-   Copyright (C) 2000-2006, 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2000-2006, 2008-2024 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -380,7 +380,7 @@ static const struct table_entry alias_table[] =
 #  if defined OS2                                           /* OS/2 */
     /* The list of encodings is taken from "List of OS/2 Codepages"
        by Alex Taylor:
-       <http://altsan.org/os2/toolkits/uls/index.html#codepages>.
+       <https://altsan.org/os2/toolkits/uls/index.html#codepages>.
        See also "__convcp() of kLIBC":
        <https://github.com/bitwiseworks/libc/blob/master/src/emx/src/lib/locale/__convcp.c>.  */
     { "CP1004",        "CP1252" },
@@ -1054,7 +1054,7 @@ locale_charset (void)
           }
       }
     if (0)
-      done_table_lookup: ;
+      done_table_lookup: {}
     else
 # endif
       {

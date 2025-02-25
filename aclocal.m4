@@ -1,4 +1,4 @@
-# generated automatically by aclocal 1.16.4 -*- Autoconf -*-
+# generated automatically by aclocal 1.16.5 -*- Autoconf -*-
 
 # Copyright (C) 1996-2021 Free Software Foundation, Inc.
 
@@ -20,8 +20,8 @@ You have another version of autoconf.  It may work, but is not guaranteed to.
 If you have problems, you may need to regenerate the build system entirely.
 To do so, use the procedure documented by the package, typically 'autoreconf'.])])
 
-# pkg.m4 - Macros to locate and utilise pkg-config.   -*- Autoconf -*-
-# serial 11 (pkg-config-0.29.1)
+# pkg.m4 - Macros to locate and use pkg-config.   -*- Autoconf -*-
+# serial 12 (pkg-config-0.29.2)
 
 dnl Copyright © 2004 Scott James Remnant <scott@netsplit.com>.
 dnl Copyright © 2012-2015 Dan Nicholson <dbn.lists@gmail.com>
@@ -63,7 +63,7 @@ dnl
 dnl See the "Since" comment for each macro you use to see what version
 dnl of the macros you require.
 m4_defun([PKG_PREREQ],
-[m4_define([PKG_MACROS_VERSION], [0.29.1])
+[m4_define([PKG_MACROS_VERSION], [0.29.2])
 m4_if(m4_version_compare(PKG_MACROS_VERSION, [$1]), -1,
     [m4_fatal([pkg.m4 version $1 or higher is required but ]PKG_MACROS_VERSION[ found])])
 ])dnl PKG_PREREQ
@@ -108,7 +108,7 @@ dnl Check to see whether a particular set of modules exists. Similar to
 dnl PKG_CHECK_MODULES(), but does not set variables or print errors.
 dnl
 dnl Please remember that m4 expands AC_REQUIRE([PKG_PROG_PKG_CONFIG])
-dnl only at the first occurence in configure.ac, so if the first place
+dnl only at the first occurrence in configure.ac, so if the first place
 dnl it's called might be skipped (such as if it is within an "if", you
 dnl have to call PKG_CHECK_EXISTS manually
 AC_DEFUN([PKG_CHECK_EXISTS],
@@ -164,7 +164,7 @@ AC_ARG_VAR([$1][_CFLAGS], [C compiler flags for $1, overriding pkg-config])dnl
 AC_ARG_VAR([$1][_LIBS], [linker flags for $1, overriding pkg-config])dnl
 
 pkg_failed=no
-AC_MSG_CHECKING([for $1])
+AC_MSG_CHECKING([for $2])
 
 _PKG_CONFIG([$1][_CFLAGS], [cflags], [$2])
 _PKG_CONFIG([$1][_LIBS], [libs], [$2])
@@ -174,17 +174,17 @@ and $1[]_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.])
 
 if test $pkg_failed = yes; then
-   	AC_MSG_RESULT([no])
+        AC_MSG_RESULT([no])
         _PKG_SHORT_ERRORS_SUPPORTED
         if test $_pkg_short_errors_supported = yes; then
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "$2" 2>&1`
-        else 
-	        $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "$2" 2>&1`
+                $1[]_PKG_ERRORS=`$PKG_CONFIG --short-errors --print-errors --cflags --libs "$2" 2>&1`
+        else
+                $1[]_PKG_ERRORS=`$PKG_CONFIG --print-errors --cflags --libs "$2" 2>&1`
         fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
+        # Put the nasty error message in config.log where it belongs
+        echo "$$1[]_PKG_ERRORS" >&AS_MESSAGE_LOG_FD
 
-	m4_default([$4], [AC_MSG_ERROR(
+        m4_default([$4], [AC_MSG_ERROR(
 [Package requirements ($2) were not met:
 
 $$1_PKG_ERRORS
@@ -195,8 +195,8 @@ installed software in a non-standard prefix.
 _PKG_TEXT])[]dnl
         ])
 elif test $pkg_failed = untried; then
-     	AC_MSG_RESULT([no])
-	m4_default([$4], [AC_MSG_FAILURE(
+        AC_MSG_RESULT([no])
+        m4_default([$4], [AC_MSG_FAILURE(
 [The pkg-config script could not be found or is too old.  Make sure it
 is in your PATH or set the PKG_CONFIG environment variable to the full
 path to pkg-config.
@@ -206,10 +206,10 @@ _PKG_TEXT
 To get pkg-config, see <http://pkg-config.freedesktop.org/>.])[]dnl
         ])
 else
-	$1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
-	$1[]_LIBS=$pkg_cv_[]$1[]_LIBS
+        $1[]_CFLAGS=$pkg_cv_[]$1[]_CFLAGS
+        $1[]_LIBS=$pkg_cv_[]$1[]_LIBS
         AC_MSG_RESULT([yes])
-	$3
+        $3
 fi[]dnl
 ])dnl PKG_CHECK_MODULES
 
@@ -379,7 +379,7 @@ AC_DEFUN([AM_AUTOMAKE_VERSION],
 [am__api_version='1.16'
 dnl Some users find AM_AUTOMAKE_VERSION and mistake it for a way to
 dnl require some minimum version.  Point them to the right macro.
-m4_if([$1], [1.16.4], [],
+m4_if([$1], [1.16.5], [],
       [AC_FATAL([Do not call $0, use AM_INIT_AUTOMAKE([$1]).])])dnl
 ])
 
@@ -395,7 +395,7 @@ m4_define([_AM_AUTOCONF_VERSION], [])
 # Call AM_AUTOMAKE_VERSION and AM_AUTOMAKE_VERSION so they can be traced.
 # This function is AC_REQUIREd by AM_INIT_AUTOMAKE.
 AC_DEFUN([AM_SET_CURRENT_AUTOMAKE_VERSION],
-[AM_AUTOMAKE_VERSION([1.16.4])dnl
+[AM_AUTOMAKE_VERSION([1.16.5])dnl
 m4_ifndef([AC_AUTOCONF_VERSION],
   [m4_copy([m4_PACKAGE_VERSION], [AC_AUTOCONF_VERSION])])dnl
 _AM_AUTOCONF_VERSION(m4_defn([AC_AUTOCONF_VERSION]))])
@@ -450,6 +450,43 @@ AC_DEFUN([AM_AUX_DIR_EXPAND],
 [AC_REQUIRE([AC_CONFIG_AUX_DIR_DEFAULT])dnl
 # Expand $ac_aux_dir to an absolute path.
 am_aux_dir=`cd "$ac_aux_dir" && pwd`
+])
+
+# AM_COND_IF                                            -*- Autoconf -*-
+
+# Copyright (C) 2008-2021 Free Software Foundation, Inc.
+#
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# _AM_COND_IF
+# _AM_COND_ELSE
+# _AM_COND_ENDIF
+# --------------
+# These macros are only used for tracing.
+m4_define([_AM_COND_IF])
+m4_define([_AM_COND_ELSE])
+m4_define([_AM_COND_ENDIF])
+
+# AM_COND_IF(COND, [IF-TRUE], [IF-FALSE])
+# ---------------------------------------
+# If the shell condition COND is true, execute IF-TRUE, otherwise execute
+# IF-FALSE.  Allow automake to learn about conditional instantiating macros
+# (the AC_CONFIG_FOOS).
+AC_DEFUN([AM_COND_IF],
+[m4_ifndef([_AM_COND_VALUE_$1],
+	   [m4_fatal([$0: no such condition "$1"])])dnl
+_AM_COND_IF([$1])dnl
+if test -z "$$1_TRUE"; then :
+  m4_n([$2])[]dnl
+m4_ifval([$3],
+[_AM_COND_ELSE([$1])dnl
+else
+  $3
+])dnl
+_AM_COND_ENDIF([$1])dnl
+fi[]dnl
 ])
 
 # AM_CONDITIONAL                                            -*- Autoconf -*-
@@ -772,6 +809,10 @@ m4_defn([AC_PROG_CC])
 # release and drop the old call support.
 AC_DEFUN([AM_INIT_AUTOMAKE],
 [AC_PREREQ([2.65])dnl
+m4_ifdef([_$0_ALREADY_INIT],
+  [m4_fatal([$0 expanded multiple times
+]m4_defn([_$0_ALREADY_INIT]))],
+  [m4_define([_$0_ALREADY_INIT], m4_expansion_stack)])dnl
 dnl Autoconf wants to disallow AM_ names.  We explicitly allow
 dnl the ones we care about.
 m4_pattern_allow([^AM_[A-Z]+FLAGS$])dnl
@@ -994,6 +1035,42 @@ else
 fi
 rmdir .tst 2>/dev/null
 AC_SUBST([am__leading_dot])])
+
+# Add --enable-maintainer-mode option to configure.         -*- Autoconf -*-
+# From Jim Meyering
+
+# Copyright (C) 1996-2021 Free Software Foundation, Inc.
+#
+# This file is free software; the Free Software Foundation
+# gives unlimited permission to copy and/or distribute it,
+# with or without modifications, as long as this notice is preserved.
+
+# AM_MAINTAINER_MODE([DEFAULT-MODE])
+# ----------------------------------
+# Control maintainer-specific portions of Makefiles.
+# Default is to disable them, unless 'enable' is passed literally.
+# For symmetry, 'disable' may be passed as well.  Anyway, the user
+# can override the default with the --enable/--disable switch.
+AC_DEFUN([AM_MAINTAINER_MODE],
+[m4_case(m4_default([$1], [disable]),
+       [enable], [m4_define([am_maintainer_other], [disable])],
+       [disable], [m4_define([am_maintainer_other], [enable])],
+       [m4_define([am_maintainer_other], [enable])
+        m4_warn([syntax], [unexpected argument to AM@&t@_MAINTAINER_MODE: $1])])
+AC_MSG_CHECKING([whether to enable maintainer-specific portions of Makefiles])
+  dnl maintainer-mode's default is 'disable' unless 'enable' is passed
+  AC_ARG_ENABLE([maintainer-mode],
+    [AS_HELP_STRING([--]am_maintainer_other[-maintainer-mode],
+      am_maintainer_other[ make rules and dependencies not useful
+      (and sometimes confusing) to the casual installer])],
+    [USE_MAINTAINER_MODE=$enableval],
+    [USE_MAINTAINER_MODE=]m4_if(am_maintainer_other, [enable], [no], [yes]))
+  AC_MSG_RESULT([$USE_MAINTAINER_MODE])
+  AM_CONDITIONAL([MAINTAINER_MODE], [test $USE_MAINTAINER_MODE = yes])
+  MAINT=$MAINTAINER_MODE_TRUE
+  AC_SUBST([MAINT])dnl
+]
+)
 
 # Check to see how 'make' treats includes.	            -*- Autoconf -*-
 
@@ -1493,9 +1570,15 @@ m4_include([m4/__inline.m4])
 m4_include([m4/absolute-header.m4])
 m4_include([m4/ac_define_dir.m4])
 m4_include([m4/alloca.m4])
+m4_include([m4/assert_h.m4])
 m4_include([m4/ax_check_compile_flag.m4])
 m4_include([m4/btowc.m4])
+m4_include([m4/build-to-host.m4])
 m4_include([m4/builtin-expect.m4])
+m4_include([m4/c-bool.m4])
+m4_include([m4/c32rtomb.m4])
+m4_include([m4/canonicalize.m4])
+m4_include([m4/chdir-long.m4])
 m4_include([m4/clock_time.m4])
 m4_include([m4/close.m4])
 m4_include([m4/closedir.m4])
@@ -1506,16 +1589,20 @@ m4_include([m4/dirent_h.m4])
 m4_include([m4/dirfd.m4])
 m4_include([m4/double-slash-root.m4])
 m4_include([m4/dup2.m4])
-m4_include([m4/eealloc.m4])
 m4_include([m4/errno_h.m4])
+m4_include([m4/error.m4])
+m4_include([m4/error_h.m4])
 m4_include([m4/exponentd.m4])
 m4_include([m4/exponentf.m4])
 m4_include([m4/exponentl.m4])
+m4_include([m4/extensions-aix.m4])
 m4_include([m4/extensions.m4])
 m4_include([m4/extern-inline.m4])
+m4_include([m4/fchdir.m4])
 m4_include([m4/fcntl-o.m4])
 m4_include([m4/fcntl.m4])
 m4_include([m4/fcntl_h.m4])
+m4_include([m4/filenamecat.m4])
 m4_include([m4/flexmember.m4])
 m4_include([m4/float_h.m4])
 m4_include([m4/fnmatch.m4])
@@ -1525,13 +1612,16 @@ m4_include([m4/free.m4])
 m4_include([m4/frexp.m4])
 m4_include([m4/frexpl.m4])
 m4_include([m4/fstat.m4])
+m4_include([m4/fstatat.m4])
 m4_include([m4/futimens.m4])
+m4_include([m4/getcwd.m4])
 m4_include([m4/getdelim.m4])
 m4_include([m4/getdtablesize.m4])
 m4_include([m4/getline.m4])
 m4_include([m4/getlogin.m4])
 m4_include([m4/getlogin_r.m4])
 m4_include([m4/getopt.m4])
+m4_include([m4/getprogname.m4])
 m4_include([m4/getrandom.m4])
 m4_include([m4/gettext.m4])
 m4_include([m4/gettime.m4])
@@ -1540,8 +1630,11 @@ m4_include([m4/glob.m4])
 m4_include([m4/glob_h.m4])
 m4_include([m4/gnulib-common.m4])
 m4_include([m4/gnulib-comp.m4])
+m4_include([m4/gnulib-i18n.m4])
+m4_include([m4/host-cpu-c-abi.m4])
 m4_include([m4/iconv.m4])
 m4_include([m4/include_next.m4])
+m4_include([m4/inline.m4])
 m4_include([m4/intlmacosx.m4])
 m4_include([m4/intmax_t.m4])
 m4_include([m4/inttypes.m4])
@@ -1551,6 +1644,10 @@ m4_include([m4/isnand.m4])
 m4_include([m4/isnanf.m4])
 m4_include([m4/isnanl.m4])
 m4_include([m4/iswblank.m4])
+m4_include([m4/iswctype.m4])
+m4_include([m4/iswdigit.m4])
+m4_include([m4/iswpunct.m4])
+m4_include([m4/iswxdigit.m4])
 m4_include([m4/langinfo_h.m4])
 m4_include([m4/largefile.m4])
 m4_include([m4/ldexpl.m4])
@@ -1560,6 +1657,7 @@ m4_include([m4/lib-prefix.m4])
 m4_include([m4/libunistring-base.m4])
 m4_include([m4/limits-h.m4])
 m4_include([m4/localcharset.m4])
+m4_include([m4/locale-en.m4])
 m4_include([m4/locale-fr.m4])
 m4_include([m4/locale-ja.m4])
 m4_include([m4/locale-zh.m4])
@@ -1570,6 +1668,7 @@ m4_include([m4/lstat.m4])
 m4_include([m4/malloc.m4])
 m4_include([m4/malloca.m4])
 m4_include([m4/math_h.m4])
+m4_include([m4/mbrtoc32.m4])
 m4_include([m4/mbrtowc.m4])
 m4_include([m4/mbsinit.m4])
 m4_include([m4/mbsrtowcs.m4])
@@ -1577,6 +1676,7 @@ m4_include([m4/mbstate_t.m4])
 m4_include([m4/mbtowc.m4])
 m4_include([m4/memchr.m4])
 m4_include([m4/mempcpy.m4])
+m4_include([m4/memrchr.m4])
 m4_include([m4/minmax.m4])
 m4_include([m4/mkdir.m4])
 m4_include([m4/mkstemps.m4])
@@ -1585,13 +1685,17 @@ m4_include([m4/mode_t.m4])
 m4_include([m4/msvc-inval.m4])
 m4_include([m4/msvc-nothrow.m4])
 m4_include([m4/multiarch.m4])
+m4_include([m4/musl.m4])
 m4_include([m4/nl_langinfo.m4])
 m4_include([m4/nls.m4])
 m4_include([m4/nocrash.m4])
+m4_include([m4/off64_t.m4])
 m4_include([m4/off_t.m4])
+m4_include([m4/once.m4])
 m4_include([m4/open-cloexec.m4])
 m4_include([m4/open-slash.m4])
 m4_include([m4/open.m4])
+m4_include([m4/openat.m4])
 m4_include([m4/opendir.m4])
 m4_include([m4/pathmax.m4])
 m4_include([m4/po.m4])
@@ -1599,11 +1703,18 @@ m4_include([m4/printf-frexp.m4])
 m4_include([m4/printf-frexpl.m4])
 m4_include([m4/printf.m4])
 m4_include([m4/progtest.m4])
+m4_include([m4/pthread-once.m4])
+m4_include([m4/pthread-spin.m4])
+m4_include([m4/pthread_h.m4])
 m4_include([m4/pthread_rwlock_rdlock.m4])
 m4_include([m4/raise.m4])
+m4_include([m4/rawmemchr.m4])
 m4_include([m4/readdir.m4])
+m4_include([m4/readlink.m4])
 m4_include([m4/realloc.m4])
 m4_include([m4/regex.m4])
+m4_include([m4/save-cwd.m4])
+m4_include([m4/sched_h.m4])
 m4_include([m4/setlocale_null.m4])
 m4_include([m4/sigaction.m4])
 m4_include([m4/signal_h.m4])
@@ -1615,9 +1726,7 @@ m4_include([m4/snprintf.m4])
 m4_include([m4/ssize_t.m4])
 m4_include([m4/stat-time.m4])
 m4_include([m4/stat.m4])
-m4_include([m4/stdalign.m4])
 m4_include([m4/stdarg.m4])
-m4_include([m4/stdbool.m4])
 m4_include([m4/stddef_h.m4])
 m4_include([m4/stdint.m4])
 m4_include([m4/stdint_h.m4])
@@ -1625,9 +1734,12 @@ m4_include([m4/stdio_h.m4])
 m4_include([m4/stdlib_h.m4])
 m4_include([m4/strcase.m4])
 m4_include([m4/strcasestr.m4])
+m4_include([m4/strdup.m4])
+m4_include([m4/strerror.m4])
 m4_include([m4/string_h.m4])
 m4_include([m4/strings_h.m4])
 m4_include([m4/strnlen.m4])
+m4_include([m4/sys_cdefs_h.m4])
 m4_include([m4/sys_random_h.m4])
 m4_include([m4/sys_socket_h.m4])
 m4_include([m4/sys_stat_h.m4])
@@ -1638,6 +1750,10 @@ m4_include([m4/tempname.m4])
 m4_include([m4/threadlib.m4])
 m4_include([m4/time_h.m4])
 m4_include([m4/timespec.m4])
+m4_include([m4/uchar_h.m4])
+m4_include([m4/unicase_h.m4])
+m4_include([m4/unictype_h.m4])
+m4_include([m4/uninorm_h.m4])
 m4_include([m4/unistd_h.m4])
 m4_include([m4/utime.m4])
 m4_include([m4/utime_h.m4])
@@ -1649,13 +1765,12 @@ m4_include([m4/vsnprintf-posix.m4])
 m4_include([m4/vsnprintf.m4])
 m4_include([m4/warn-on-use.m4])
 m4_include([m4/wchar_h.m4])
-m4_include([m4/wchar_t.m4])
 m4_include([m4/wcrtomb.m4])
+m4_include([m4/wctype.m4])
 m4_include([m4/wctype_h.m4])
 m4_include([m4/wcwidth.m4])
 m4_include([m4/wint_t.m4])
 m4_include([m4/wmemchr.m4])
 m4_include([m4/wmempcpy.m4])
 m4_include([m4/xsize.m4])
-m4_include([m4/year2038.m4])
 m4_include([m4/zzgnulib.m4])
