@@ -1,7 +1,7 @@
 /**************************************************************************
  *   nano.c  --  This file is part of GNU nano.                           *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2024 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2025 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014-2022 Benno Schulenberg                            *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
@@ -15,7 +15,7 @@
  *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
+ *   along with this program.  If not, see https://gnu.org/licenses/.     *
  *                                                                        *
  **************************************************************************/
 
@@ -260,7 +260,7 @@ void finish(void)
 #endif
 
 	/* Get out. */
-	exit(0);
+	exit(final_status);
 }
 
 /* Close the current buffer, and terminate nano if it is the only buffer. */
@@ -667,7 +667,7 @@ void version(void)
 #endif
 #ifndef NANO_TINY
 	/* TRANSLATORS: The %s is the year of the latest release. */
-	printf(_(" (C) %s the Free Software Foundation and various contributors\n"), "2024");
+	printf(_(" (C) %s the Free Software Foundation and various contributors\n"), "2025");
 #endif
 	printf(_(" Compiled options:"));
 
@@ -1439,31 +1439,34 @@ void suck_up_input_and_paste_it(void)
 	linestruct *was_cutbuffer = cutbuffer;
 	linestruct *line = make_new_node(NULL);
 	size_t index = 0;
+	int input = ERR;
 
 	line->data = copy_of("");
 	cutbuffer = line;
 
-	while (bracketed_paste) {
-		int input = get_kbinput(midwin, BLIND);
+	while (TRUE) {
+		input = get_kbinput(midwin, BLIND);
 
-		if (input == '\r' || input == '\n') {
+		if ((0x20 <= input && input <= 0xFF && input != DEL_CODE) || input == '\t') {
+			line->data = nrealloc(line->data, index + 2);
+			line->data[index++] = (char)input;
+			line->data[index] = '\0';
+		} else if (input == '\r' || input == '\n') {
 			line->next = make_new_node(line);
 			line = line->next;
 			line->data = copy_of("");
 			index = 0;
-		} else if ((0x20 <= input && input <= 0xFF && input != DEL_CODE) ||
-														input == '\t') {
-			line->data = nrealloc(line->data, index + 2);
-			line->data[index++] = (char)input;
-			line->data[index] = '\0';
-		} else if (input != BRACKETED_PASTE_MARKER)
-			beep();
+		} else
+			break;
 	}
 
 	if (ISSET(VIEW_MODE))
 		print_view_warning();
 	else
 		paste_text();
+
+	if (input != END_OF_PASTE)
+		statusline(ALERT, _("Flawed paste"));
 
 	free_lines(cutbuffer);
 	cutbuffer = was_cutbuffer;
@@ -1720,9 +1723,6 @@ void process_a_keystroke(void)
 	} else if (openfile->current != was_current)
 		also_the_last = FALSE;
 
-	if (bracketed_paste)
-		suck_up_input_and_paste_it();
-
 	if (ISSET(STATEFLAGS) && openfile->mark != was_mark)
 		titlebar(NULL);
 #endif
@@ -1832,6 +1832,7 @@ int main(int argc, char **argv)
 		{"indicator", 0, NULL, 'q'},
 		{"unix", 0, NULL, 'u'},
 		{"afterends", 0, NULL, 'y'},
+		{"whitespacedisplay", 0, NULL, 0xCC},
 		{"colonparsing", 0, NULL, '@'},
 		{"stateflags", 0, NULL, '%'},
 		{"minibar", 0, NULL, '_'},
@@ -1864,7 +1865,7 @@ int main(int argc, char **argv)
 	/* If setting the locale is successful and it uses UTF-8, we will
 	 * need to use the multibyte functions for text processing. */
 	if (setlocale(LC_ALL, "") && strcmp(nl_langinfo(CODESET), "UTF-8") == 0)
-		utf8_init();
+		using_utf8 = TRUE;
 #else
 	setlocale(LC_ALL, "");
 #endif
@@ -2128,6 +2129,9 @@ int main(int argc, char **argv)
 				break;
 #endif
 #ifndef NANO_TINY
+			case 0xCC:
+				SET(WHITESPACE_DISPLAY);
+				break;
 			case '@':
 				SET(COLON_PARSING);
 				break;
@@ -2370,7 +2374,7 @@ int main(int argc, char **argv)
 	/* If the whitespace option wasn't specified, set its default value. */
 	if (whitespace == NULL) {
 #ifdef ENABLE_UTF8
-		if (using_utf8()) {
+		if (using_utf8) {
 			/* A tab is shown as a Right-Pointing Double Angle Quotation Mark
 			 * (U+00BB), and a space as a Middle Dot (U+00B7). */
 			whitespace = copy_of("\xC2\xBB\xC2\xB7");
@@ -2384,6 +2388,9 @@ int main(int argc, char **argv)
 			whitelen[1] = 1;
 		}
 	}
+
+	/* Initialize a special stash for something typed at the Execute prompt. */
+	foretext = copy_of("");
 #endif /* !NANO_TINY */
 
 	/* Initialize the search string. */
@@ -2475,6 +2482,10 @@ int main(int argc, char **argv)
 	shiftaltright = get_keycode("kRIT4", SHIFT_ALT_RIGHT);
 	shiftaltup = get_keycode("kUP4", SHIFT_ALT_UP);
 	shiftaltdown = get_keycode("kDN4", SHIFT_ALT_DOWN);
+
+	/* Tell ncurses to transform bracketed-paste sequences into keycodes. */
+	define_key("\e[200~", START_OF_PASTE);
+	define_key("\e[201~", END_OF_PASTE);
 #endif
 	mousefocusin = get_keycode("kxIN", FOCUS_IN);
 	mousefocusout = get_keycode("kxOUT", FOCUS_OUT);
@@ -2591,12 +2602,8 @@ int main(int argc, char **argv)
 		}
 #endif
 #ifdef ENABLE_HISTORIES
-		else if (ISSET(POSITIONLOG) && openfile->filename[0] != '\0') {
-			ssize_t savedline, savedcol;
-			/* If edited before, restore the last cursor position. */
-			if (has_old_position(argv[optind - 1], &savedline, &savedcol))
-				goto_line_and_column(savedline, savedcol, FALSE, FALSE);
-		}
+		else if (ISSET(POSITIONLOG) && openfile->filename[0] != '\0')
+			restore_cursor_position_if_any();
 #endif
 	}
 
@@ -2676,6 +2683,16 @@ int main(int argc, char **argv)
 
 		as_an_at = TRUE;
 
+#if defined(ENABLE_UTF8) && !defined(NANO_TINY)
+#define byte(n)  (unsigned char)openfile->current->data[n]
+		/* Tell the user when the cursor sits on a BOM. */
+		if (openfile->current_x == 0 && byte(0) == 0xEF && byte(1) == 0xBB &&
+										byte(2) == 0xBF && using_utf8) {
+			statusline(NOTICE, _("Byte Order Mark"));
+			set_blankdelay_to_one();
+		}
+#endif
+
 		if ((refresh_needed && LINES > 1) || (LINES == 1 && lastmessage <= HUSH))
 			edit_refresh();
 		else
@@ -2696,6 +2713,7 @@ int main(int argc, char **argv)
 			wredrawln(midwin, editwinrows - 1, 1);
 #endif
 
+		final_status = 0;
 		errno = 0;
 		focusing = TRUE;
 

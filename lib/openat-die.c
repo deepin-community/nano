@@ -1,6 +1,6 @@
 /* Report a save- or restore-cwd failure in our openat replacement and then exit.
 
-   Copyright (C) 2005-2006, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2008-2025 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ _Noreturn void
 openat_save_fail (int errnum)
 {
 #ifndef GNULIB_LIBPOSIX
-  error (exit_failure, errnum, "%s",
+  error (exit_failure, errnum,
          _("unable to record current working directory"));
 #endif
   /* _Noreturn cannot be applied to error, since it returns
@@ -53,7 +53,7 @@ _Noreturn void
 openat_restore_fail (int errnum)
 {
 #ifndef GNULIB_LIBPOSIX
-  error (exit_failure, errnum, "%s",
+  error (exit_failure, errnum,
          _("failed to return to initial working directory"));
 #endif
 
