@@ -1,7 +1,7 @@
 /**************************************************************************
  *   files.c  --  This file is part of GNU nano.                          *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2024 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2025 Free Software Foundation, Inc.    *
  *   Copyright (C) 2015-2022 Benno Schulenberg                            *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
@@ -15,7 +15,7 @@
  *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
+ *   along with this program.  If not, see https://gnu.org/licenses/.     *
  *                                                                        *
  **************************************************************************/
 
@@ -1197,6 +1197,12 @@ void insert_a_file_or(bool execute)
 	/* Reset the flag that is set by the Spell Checker and Linter and such. */
 	ran_a_tool = FALSE;
 
+#ifndef NANO_TINY
+	/* If something was typed at the Execute prompt without being run, restore it. */
+	if (execute && *foretext)
+		given = mallocstrcpy(given, foretext);
+#endif
+
 	while (TRUE) {
 #ifndef NANO_TINY
 		if (execute) {
@@ -1336,12 +1342,10 @@ void insert_a_file_or(bool execute)
 			if (ISSET(MULTIBUFFER)) {
 #ifdef ENABLE_HISTORIES
 				if (ISSET(POSITIONLOG)) {
-					ssize_t priorline, priorcol;
 #ifndef NANO_TINY
 					if (!execute)
 #endif
-					if (has_old_position(answer, &priorline, &priorcol))
-						goto_line_and_column(priorline, priorcol, FALSE, FALSE);
+						restore_cursor_position_if_any();
 				}
 #endif
 				/* Update title bar and color info for this new buffer. */
@@ -1551,10 +1555,10 @@ void init_backup_dir(void)
 }
 #endif
 
-/* Read all data from inn, and write it to out.  File inn must be open for
- * reading, and out for writing.  Return 0 on success, a negative number on
- * read error, and a positive number on write error.  File inn is always
- * closed by this function, out is closed  only if close_out is true. */
+/* Read all data from `inn`, and write it to `out`.  File `inn` must be open
+ * for reading, and `out` for writing.  Return 0 on success, a negative number
+ * on read error, and a positive number on write error.  File `inn` is always
+ * closed by this function, `out` is closed only if `close_out` is true. */
 int copy_file(FILE *inn, FILE *out, bool close_out)
 {
 	int retval = 0;
@@ -2156,11 +2160,11 @@ int write_it_out(bool exiting, bool withprompt)
 						(method == APPEND) ? _("Append Selection to File") :
 						_("Write Selection to File");
 		else if (method != OVERWRITE)
-			msg = (method == PREPEND) ? _("File Name to Prepend to") :
-										_("File Name to Append to");
+			/* TRANSLATORS: Next three prompts are analogous to the above three. */
+			msg = (method == PREPEND) ? _("Prepend to File") : _("Append to File");
 		else
 #endif
-			msg = _("File Name to Write");
+			msg = _("Write to File");
 
 		present_path = mallocstrcpy(present_path, "./");
 
@@ -2189,6 +2193,7 @@ int write_it_out(bool exiting, bool withprompt)
 
 		/* Upon request, abandon the buffer. */
 		if (function == discard_buffer) {
+			final_status = 2;  /* ^O^Q makes nano exit with an error. */
 			free(given);
 			return 2;
 		}

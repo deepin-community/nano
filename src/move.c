@@ -1,7 +1,7 @@
 /**************************************************************************
  *   move.c  --  This file is part of GNU nano.                           *
  *                                                                        *
- *   Copyright (C) 1999-2011, 2013-2024 Free Software Foundation, Inc.    *
+ *   Copyright (C) 1999-2011, 2013-2025 Free Software Foundation, Inc.    *
  *   Copyright (C) 2014-2018 Benno Schulenberg                            *
  *                                                                        *
  *   GNU nano is free software: you can redistribute it and/or modify     *
@@ -15,7 +15,7 @@
  *   See the GNU General Public License for more details.                 *
  *                                                                        *
  *   You should have received a copy of the GNU General Public License    *
- *   along with this program.  If not, see http://www.gnu.org/licenses/.  *
+ *   along with this program.  If not, see https://gnu.org/licenses/.     *
  *                                                                        *
  **************************************************************************/
 
@@ -227,7 +227,9 @@ void do_cycle(void)
 /* Scroll the line with the cursor to the center of the screen. */
 void do_center(void)
 {
-	do_cycle();  /* The main loop has set 'cycling_aim' to zero. */
+	adjust_viewport(CENTERING);
+	draw_all_subwindows();
+	full_refresh();
 }
 #endif /* !NANO_TINY */
 
