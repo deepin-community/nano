@@ -1,3 +1,10 @@
+nano (8.5-1+deepin2) unstable; urgency=medium
+
+  * Fix CVE-2026-6843: Format string vulnerability in statusline()
+    function leading to denial of service.
+
+ -- deepin-ci-robot <packages@deepin.org>  Wed, 03 Jun 2026 19:00:00 +0800
+
 nano (8.5-1+deepin1) unstable; urgency=medium
 
   * Fix CVE-2026-6842: Incorrect directory permissions for ~/.local
