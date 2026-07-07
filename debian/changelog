@@ -1,3 +1,9 @@
+nano (8.5-1deepin1) unstable; urgency=medium
+
+  * fix(cve): CVE-2026-6842 - Restrict .local directory permissions
+
+ -- 胡登 <ut000081@golf66work>  Tue, 07 Jul 2026 16:47:13 +0800
+
 nano (8.5-1) unstable; urgency=medium
 
   * The "Anas al-Sharif" release.
